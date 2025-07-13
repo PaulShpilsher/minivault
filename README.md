@@ -49,6 +49,9 @@ curl -X POST http://localhost:8080/generate \
   Implements adapters for logging and LLM (Ollama) API.  
   Handles external communication and persistence.
 
+- **Config (`config/`)**  
+  Centralized configuration management. Loads environment variables and provides settings to the rest of the application.
+
 - **Mocks (`mocks/`)**  
   Test doubles for all ports/interfaces, used in unit tests.
 
@@ -61,6 +64,7 @@ Client → API Handler → Usecase (Application) → Domain Validation → Infra
 - **Infrastructure**: Adapters for logging and LLM API (`infrastructure/`)
 - **API Layer**: HTTP handlers, request/response formatting (`api/`)
 - **Server**: HTTP server and middleware (`server/`)
+- **Config**: Centralized configuration management (`config/`)
 - **Mocks**: Test doubles for all ports (`mocks/`)
 
 ---
@@ -71,6 +75,7 @@ Client → API Handler → Usecase (Application) → Domain Validation → Infra
 minivault/
 ├── api/                # HTTP handlers
 ├── cmd/                # Entry point (main.go)
+├── config/             # Centralized configuration management
 ├── domain/             # Entities, validation, ports (interfaces)
 ├── infrastructure/     # Adapters: logging, LLM (Ollama)
 ├── mocks/              # Generated/test mocks
@@ -124,6 +129,20 @@ curl -X POST http://localhost:8080/generate \
 
 ---
 
+## ⚙️ Configuration
+
+MiniVault uses environment variables (optionally loaded from a `.env` file) for configuration. The following settings are available:
+
+| Variable         | Default                                 | Description                                                      |
+|------------------|-----------------------------------------|------------------------------------------------------------------|
+| MINIVAULT_PORT   | `:8080`                                 | The port/address the API server listens on                       |
+| OLLAMA_URL       | `http://localhost:11434/api/chat`       | The URL for the Ollama chat API                                  |
+| OLLAMA_MODEL     | `gemma:2b`                              | The Ollama model to use for generation (must be installed)       |
+
+You can create a `.env` file in the project root to override these defaults:
+
+---
+
 ## 🧪 Testing
 
 - All business logic, HTTP handlers, and infrastructure are covered by unit tests.
@@ -142,6 +161,20 @@ curl -X POST http://localhost:8080/generate \
 - **Errors, warnings, info**: Console (with timestamps)
 - Uses [zerolog](https://github.com/rs/zerolog) for structured logging
 
+```
+MINIVAULT_PORT=:8080
+OLLAMA_URL=http://localhost:11434/api/chat
+OLLAMA_MODEL=gemma:2b
+```
+
+> **Note:** The value of `OLLAMA_MODEL` must match a model that is installed in your local Ollama instance. For example, if you set `OLLAMA_MODEL=llama2:7b`, you must have run `ollama pull llama2:7b` beforehand.
+
+---
+
+## ℹ️ Notes
+- Minimal, synchronous API for clarity. For streaming, see Ollama docs and Go's `http.Flusher`.
+- All logic is local; no cloud LLMs are used.
+
 ---
 
 ## 🛠️ Improvements & TODOs
@@ -152,12 +185,5 @@ curl -X POST http://localhost:8080/generate \
 - [ ] Expand test coverage (integration, infra)
 - [ ] Enhance error handling and observability
 
----
-
-## ℹ️ Notes
-- Minimal, synchronous API for clarity. For streaming, see Ollama docs and Go's `http.Flusher`.
-- All logic is local; no cloud LLMs are used.
-
----
 
 _Made for the ModelVault take-home project._
