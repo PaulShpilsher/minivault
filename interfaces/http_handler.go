@@ -12,7 +12,7 @@ type HttpHandler struct {
 	logger    domain.LoggerPort
 }
 
-func NewHttpHandler(generator domain.GeneratorPort, logger domain.LoggerPort) *HttpHandler {
+func NewHttpHandler(generator domain.GeneratorPort, logger domain.LoggerPort) domain.HttpHandlerPort {
 	return &HttpHandler{generator: generator, logger: logger}
 }
 

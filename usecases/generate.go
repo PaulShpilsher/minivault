@@ -18,6 +18,7 @@ func NewGenerator(ollama domain.OllamaPort, logger domain.LoggerPort) domain.Gen
 	return &service{ollama: ollama, logger: logger}
 }
 
+// Generate implements GeneratorPort
 func (g *service) Generate(prompt string) (string, error) {
 	if len(strings.TrimSpace(prompt)) == 0 {
 		return "", fmt.Errorf("prompt cannot be empty")

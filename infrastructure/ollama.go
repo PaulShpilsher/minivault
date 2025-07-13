@@ -13,12 +13,12 @@ import (
 const ollamaURL = "http://localhost:11434/api/chat"
 const ollamaModel = "gemma:2b"
 
-type OllamaClient struct {
+type ollamaClient struct {
 	httpClient *http.Client
 }
 
-func NewOllamaClient() *OllamaClient {
-	return &OllamaClient{
+func NewOllamaClient() domain.OllamaPort {
+	return &ollamaClient{
 		httpClient: &http.Client{
 			Timeout: 30 * time.Second,
 		},
@@ -26,7 +26,7 @@ func NewOllamaClient() *OllamaClient {
 }
 
 // CallOllama performs a non-streaming chat request (implements domain.OllamaPort)
-func (c *OllamaClient) CallOllama(prompt string) (string, error) {
+func (c *ollamaClient) CallOllama(prompt string) (string, error) {
 	chatReq := domain.OllamaChatRequest{
 		Model: ollamaModel,
 		Messages: []domain.OllamaChatMessage{{
