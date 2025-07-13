@@ -8,11 +8,20 @@ type GenerateResponse struct {
 	Response string `json:"response"`
 }
 
-type OllamaRequest struct {
-	Model  string `json:"model"`
-	Prompt string `json:"prompt"`
+type OllamaChatMessage struct {
+	Role    string `json:"role"`
+	Content string `json:"content"`
 }
 
-type OllamaResponse struct {
-	Response string `json:"response"`
+type OllamaChatRequest struct {
+	Model    string               `json:"model"`
+	Messages []OllamaChatMessage  `json:"messages"`
+	Stream   bool                 `json:"stream,omitempty"`
+}
+
+type OllamaChatResponse struct {
+	Message struct {
+		Role    string `json:"role"`
+		Content string `json:"content"`
+	} `json:"message"`
 }
