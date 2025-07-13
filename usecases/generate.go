@@ -1,6 +1,7 @@
 package usecases
 
 import (
+	"fmt"
 	"minivault/domain"
 )
 
@@ -19,6 +20,7 @@ func NewGenerator(ollama domain.OllamaPort, logger domain.LoggerPort) domain.Gen
 func (g *service) Generate(prompt string) (string, error) {
 	response, err := g.ollama.CallOllama(prompt)
 	if err != nil {
+		err = fmt.Errorf("ollama call failed: %w", err)
 		g.logger.LogError("generation failed", err)
 		return "", err
 	}
