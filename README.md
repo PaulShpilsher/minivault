@@ -4,32 +4,40 @@ A minimal local REST API that simulates a core ModelVault feature: receiving a p
 
 ## Features
 - POST `/generate` endpoint
-- Uses locally running Ollama (gemma:2b model)
-- Logs all input/output to `logs/log.jsonl`
-- Minimal dependencies (pure Go stdlib)
+- Uses locally running Ollama (for this POC, the gemma:2b model is chosen)
+- AI Generation logs are stored in `logs/log.jsonl`, everything else is logged to console
 
 ## Requirements
-- Go 1.18+
+- Go 1.24+
 - [Ollama](https://ollama.com/) installed and running locally
-- gemma:2b model pulled (`ollama pull gemma:2b`)
+- gemma:2b model pulled (`ollama pull gemma:2b`)  
+  _Note: For the purpose of this proof of concept, the gemma:2b model is used. You can substitute another model if desired, but the `ollamaURL` and `ollamaModel` constants in `infrastructure/ollama.go` will need to be updated to reflect the change._
+  
+  TODO: make this configurable, e.g. via environment variables
 
 ## Setup
 
 1. **Clone repo**
 
 ```bash
-git clone <your_repo_url>
+git clone https://github.com/PaulShpilsher/minivault.git
 cd minivault
 ```
 
-2. **Start Ollama**
+2. **Download and install Ollama**
+- **Linux:**
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+```
+This script downloads the latest ollama binary and sets it up in /usr/local/bin.
 
+3. **Start Ollama**
 ```bash
 ollama serve &
 ollama pull gemma:2b
 ```
 
-3. **Run the server**
+4. **Run the server**
 
 ```bash
 go run main.go
@@ -54,7 +62,8 @@ Response:
 
 ## Logs
 
-All interactions are logged to `logs/log.jsonl` in JSONL format.
+AI Generation interactions are logged to `logs/log.jsonl` in JSONL format.
+Everything else is logged to console.
 
 ## Notes
 - The API is minimal and synchronous for simplicity. For streaming/token-by-token output, see Ollama's streaming API and Go's `http.Flusher`.
