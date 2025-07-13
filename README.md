@@ -193,10 +193,10 @@ MiniVault uses environment variables (optionally loaded from a `.env` file) for 
 
 ## 🛠️ Improvements & TODOs
 - [ ] Streaming responses (token-by-token)
-- [ ] Make model/endpoint configurable via env vars
+- [*] Make model/endpoint configurable via env vars
 - [ ] Add CLI or Postman collection for easier testing
 - [ ] Add more endpoints (health, status, etc.)
-- [ ] Expand test coverage (integration, infra)
+- [*] Expand test coverage (integration, infra)
 - [ ] Enhance error handling and observability
 
 ---
