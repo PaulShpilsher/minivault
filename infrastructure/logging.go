@@ -15,9 +15,13 @@ type DefaultLogger struct {
 }
 
 func NewLogger() *DefaultLogger {
-	os.MkdirAll("logs", 0755)
-	logFile, err := os.OpenFile("logs/log.jsonl", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	err := os.MkdirAll("logs", 0755)
+	if err != nil {
+		panic(err)
+	}
+
 	var fileLogger, consoleLogger zerolog.Logger
+	logFile, err := os.OpenFile("logs/log.jsonl", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		consoleLogger = zerolog.New(os.Stdout).With().Timestamp().Logger()
 		fileLogger = zerolog.New(os.Stdout).With().Timestamp().Logger() // fallback: file logs to stdout too
@@ -31,6 +35,10 @@ func NewLogger() *DefaultLogger {
 
 func (l *DefaultLogger) LogInteraction(prompt, response string) {
 	l.fileLogger.Info().
+		Interface("prompt", prompt).
+		Interface("response", response)
+
+	l.consoleLogger.Info().
 		Interface("prompt", prompt).
 		Interface("response", response)
 }

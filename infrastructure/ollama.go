@@ -33,6 +33,7 @@ func (c *OllamaClient) CallOllama(prompt string) (string, error) {
 			Role:    "user",
 			Content: prompt,
 		}},
+		Stream: false,
 	}
 	chatData, err := json.Marshal(chatReq)
 	if err != nil {
@@ -52,7 +53,7 @@ func (c *OllamaClient) CallOllama(prompt string) (string, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		body, _ := io.ReadAll(resp.Body)
+		body, _ := io.ReadAll(io.LimitReader(resp.Body, 4096))
 		return "", fmt.Errorf("ollama API returned status %d: %s", resp.StatusCode, string(body))
 	}
 

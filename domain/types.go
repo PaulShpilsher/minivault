@@ -1,7 +1,7 @@
 package domain
 
 type GenerateRequest struct {
-	Prompt string `json:"prompt"`
+	Prompt string `json:"prompt" validate:"required,ne="`
 }
 
 type GenerateResponse struct {
@@ -16,7 +16,7 @@ type OllamaChatMessage struct {
 type OllamaChatRequest struct {
 	Model    string              `json:"model"`
 	Messages []OllamaChatMessage `json:"messages"`
-	Stream   bool                `json:"stream,omitempty"`
+	Stream   bool                `json:"stream"`
 }
 
 type OllamaChatResponse struct {

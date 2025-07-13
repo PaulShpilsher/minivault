@@ -12,7 +12,7 @@ func main() {
 	logger := infrastructure.NewLogger()
 	ollama := infrastructure.NewOllamaClient()
 	generator := usecases.NewGenerator(ollama, logger)
-	handler := interfaces.NewHttpHandler(generator)
+	handler := interfaces.NewHttpHandler(generator, logger)
 
 	http.HandleFunc("/generate", handler.Generate)
 
