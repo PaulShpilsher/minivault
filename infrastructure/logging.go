@@ -1,22 +1,10 @@
 package infrastructure
 
 import (
-	"minivault/domain"
 	"os"
 
 	"github.com/rs/zerolog"
 )
-
-// Logger is the logging port/interface for testable logging
-// (If you use mockgen for tests; otherwise, implement manually)
-//
-//go:generate mockgen -destination=../mocks/mock_logger.go -package=mocks minivault/infrastructure Logger
-type Logger interface {
-	LogInteraction(input domain.GenerateRequest, output domain.GenerateResponse)
-	LogError(message string, err error)
-	LogWarn(message string)
-	LogInfo(message string)
-}
 
 // DefaultLogger implements Logger using zerolog
 // It logs interactions to file, and other logs to console
@@ -41,12 +29,10 @@ func NewLogger() *DefaultLogger {
 	return &DefaultLogger{fileLogger: fileLogger, consoleLogger: consoleLogger}
 }
 
-func (l *DefaultLogger) LogInteraction(input domain.GenerateRequest, output domain.GenerateResponse) {
+func (l *DefaultLogger) LogInteraction(prompt, response string) {
 	l.fileLogger.Info().
-		Str("type", "interaction").
-		Interface("input", input).
-		Interface("output", output).
-		Msg("Handled interaction")
+		Interface("prompt", prompt).
+		Interface("response", response)
 }
 
 func (l *DefaultLogger) LogError(message string, err error) {
@@ -60,6 +46,3 @@ func (l *DefaultLogger) LogWarn(message string) {
 func (l *DefaultLogger) LogInfo(message string) {
 	l.consoleLogger.Info().Msg(message)
 }
-
-// The default logger instance used by production code
-var AppLogger Logger = NewLogger()

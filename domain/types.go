@@ -14,9 +14,9 @@ type OllamaChatMessage struct {
 }
 
 type OllamaChatRequest struct {
-	Model    string               `json:"model"`
-	Messages []OllamaChatMessage  `json:"messages"`
-	Stream   bool                 `json:"stream,omitempty"`
+	Model    string              `json:"model"`
+	Messages []OllamaChatMessage `json:"messages"`
+	Stream   bool                `json:"stream,omitempty"`
 }
 
 type OllamaChatResponse struct {
