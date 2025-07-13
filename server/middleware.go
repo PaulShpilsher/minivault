@@ -6,6 +6,14 @@ import (
 	"minivault/domain"
 )
 
+// BodyLimitMiddleware limits incoming request body size to 4KB (4096 bytes).
+func BodyLimitMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		r.Body = http.MaxBytesReader(w, r.Body, 4096)
+		next.ServeHTTP(w, r)
+	})
+}
+
 // RecoveryMiddleware returns a middleware that recovers from panics and logs them using the provided logger.
 func RecoveryMiddleware(logger domain.LoggerPort, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

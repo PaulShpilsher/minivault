@@ -18,7 +18,8 @@ func newServer() *http.Server {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/generate", handler.Generate)
 
-	wrapped := RecoveryMiddleware(logger, mux)
+	wrapped := BodyLimitMiddleware(mux)
+	wrapped = RecoveryMiddleware(logger, wrapped)
 
 	return &http.Server{
 		Addr:    ":8080",
