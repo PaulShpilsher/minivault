@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"minivault/domain"
 	"net/http"
+	"strings"
 )
 
 type HttpHandler struct {
@@ -35,7 +36,7 @@ func (h *HttpHandler) Generate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Validate request body
-	if req.Prompt == "" {
+	if len(strings.TrimSpace(req.Prompt)) == 0 {
 		h.logger.LogError("Empty prompt in /generate", nil)
 		http.Error(w, "Empty prompt", http.StatusBadRequest)
 		return
