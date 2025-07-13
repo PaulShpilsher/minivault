@@ -1,7 +1,23 @@
 package domain
 
+import (
+	"errors"
+	"strings"
+)
+
 type GenerateRequest struct {
-	Prompt string `json:"prompt" validate:"required,ne="`
+	Prompt string `json:"prompt"`
+}
+
+// ErrEmptyPrompt is returned when the prompt is empty.
+var ErrEmptyPrompt = errors.New("prompt cannot be empty")
+
+// Validate checks business invariants for GenerateRequest.
+func (r *GenerateRequest) Validate() error {
+	if len(strings.TrimSpace(r.Prompt)) == 0 {
+		return ErrEmptyPrompt
+	}
+	return nil
 }
 
 type GenerateResponse struct {

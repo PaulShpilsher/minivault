@@ -20,35 +20,6 @@ func TestService_Generate_Success(t *testing.T) {
 	}
 }
 
-func TestService_Generate_WhitespacePrompt_ErrorMessage(t *testing.T) {
-	mockLogger := &mocks.MockLogger{}
-	g := &service{ollama: &mocks.MockOllama{}, logger: mockLogger}
-	resp, err := g.Generate("   \t\n ")
-	if err == nil || resp != "" {
-		t.Error("whitespace prompt should error")
-	}
-	if err == nil || err.Error() != "prompt cannot be empty" {
-		t.Errorf("unexpected error message: %v", err)
-	}
-	if len(mockLogger.Errors) != 0 && len(mockLogger.Interactions) != 0 {
-		t.Error("logger should not be called on prompt validation error")
-	}
-}
-
-func TestService_Generate_EmptyPrompt_ErrorMessage(t *testing.T) {
-	mockLogger := &mocks.MockLogger{}
-	g := &service{ollama: &mocks.MockOllama{}, logger: mockLogger}
-	resp, err := g.Generate("")
-	if err == nil || resp != "" {
-		t.Error("empty prompt should error")
-	}
-	if err == nil || err.Error() != "prompt cannot be empty" {
-		t.Errorf("unexpected error message: %v", err)
-	}
-	if len(mockLogger.Errors) != 0 && len(mockLogger.Interactions) != 0 {
-		t.Error("logger should not be called on prompt validation error")
-	}
-}
 
 func TestService_Generate_LoggerValues(t *testing.T) {
 	mockOllama := &mocks.MockOllama{Response: "ok"}
@@ -74,13 +45,6 @@ func TestService_Generate_MultipleCalls(t *testing.T) {
 	}
 }
 
-func TestService_Generate_EmptyPrompt(t *testing.T) {
-	g := &service{ollama: &mocks.MockOllama{}, logger: &mocks.MockLogger{}}
-	resp, err := g.Generate("")
-	if err == nil || resp != "" {
-		t.Error("empty prompt should error")
-	}
-}
 
 func TestService_Generate_OllamaError_MessageAndLogger(t *testing.T) {
 	ollamaErr := errors.New("fail")

@@ -3,7 +3,6 @@ package usecases
 import (
 	"fmt"
 	"minivault/domain"
-	"strings"
 )
 
 // service is the default implementation, depends on OllamaPort and Logger
@@ -20,9 +19,7 @@ func NewGenerator(ollama domain.OllamaPort, logger domain.LoggerPort) domain.Gen
 
 // Generate implements GeneratorPort
 func (g *service) Generate(prompt string) (string, error) {
-	if len(strings.TrimSpace(prompt)) == 0 {
-		return "", fmt.Errorf("prompt cannot be empty")
-	}
+	// prompt validation is now handled in the domain layer (interfaces)
 	response, err := g.ollama.CallOllama(prompt)
 	if err != nil {
 		err = fmt.Errorf("ollama call failed: %w", err)

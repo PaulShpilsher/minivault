@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"minivault/domain"
 	"net/http"
-	"strings"
+	"github.com/google/uuid"
 )
 
 type HttpHandler struct {
@@ -18,48 +18,59 @@ func NewHttpHandler(generator domain.GeneratorPort, logger domain.LoggerPort) do
 }
 
 // Generate handles /generate POST requests with improved error logging and structured responses.
+func writeError(w http.ResponseWriter, logger domain.LoggerPort, reqID string, msg string, err error, code int) {
+	if err != nil {
+		logger.LogError(msg+" [reqID: "+reqID+"]", err)
+	} else {
+		logger.LogWarn(msg+" [reqID: "+reqID+"]")
+	}
+	w.Header().Set("X-Request-ID", reqID)
+	http.Error(w, msg+" [reqID: "+reqID+"]", code)
+}
+
 func (h *HttpHandler) Generate(w http.ResponseWriter, r *http.Request) {
+	// Assign a request ID for tracing
+	reqID := uuid.New().String()
+
+	// Limit body size
+	r.Body = http.MaxBytesReader(w, r.Body, 4096)
 
 	// Validate request method
 	if r.Method != http.MethodPost {
-		h.logger.LogWarn("Rejected non-POST request to /generate")
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		writeError(w, h.logger, reqID, "Method not allowed", nil, http.StatusMethodNotAllowed)
 		return
 	}
 
 	// Parse request body
 	var req domain.GenerateRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		h.logger.LogError("Failed to decode JSON in /generate", err)
-		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+	dec := json.NewDecoder(r.Body)
+	if err := dec.Decode(&req); err != nil {
+		writeError(w, h.logger, reqID, "Invalid JSON", err, http.StatusBadRequest)
 		return
 	}
 
-	// Validate request body
-	if len(strings.TrimSpace(req.Prompt)) == 0 {
-		h.logger.LogError("Empty prompt in /generate", nil)
-		http.Error(w, "Empty prompt", http.StatusBadRequest)
+	// Validate request body using domain logic
+	if err := req.Validate(); err != nil {
+		writeError(w, h.logger, reqID, "Validation error", err, http.StatusBadRequest)
 		return
 	}
 
 	// Generate response
 	resp, err := h.generator.Generate(req.Prompt)
 	if err != nil {
-		h.logger.LogError("Generator failed in /generate", err)
-		http.Error(w, "Failed to generate response", http.StatusInternalServerError)
+		writeError(w, h.logger, reqID, "Failed to generate response", err, http.StatusInternalServerError)
 		return
 	}
 
 	// Encode response
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(domain.GenerateResponse{Response: resp}); err != nil {
-		h.logger.LogError("Failed to encode response JSON in /generate", err)
-		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		writeError(w, h.logger, reqID, "Failed to encode response", err, http.StatusInternalServerError)
 		return
 	}
 
-	// Write resp// Write responseonse
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("X-Request-ID", reqID)
 	w.WriteHeader(http.StatusOK)
 	w.Write(buf.Bytes())
 }
