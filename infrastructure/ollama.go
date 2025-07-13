@@ -5,30 +5,32 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"minivault/config"
 	"minivault/domain"
 	"net/http"
 	"time"
 )
 
-const ollamaURL = "http://localhost:11434/api/chat"
-const ollamaModel = "gemma:2b"
-
 type ollamaClient struct {
-	httpClient *http.Client
+	httpClient  *http.Client
+	ollamaURL   string
+	ollamaModel string
 }
 
-func NewOllamaClient() domain.OllamaPort {
+func NewOllamaClient(cfg *config.Config) domain.OllamaPort {
 	return &ollamaClient{
 		httpClient: &http.Client{
 			Timeout: 30 * time.Second,
 		},
+		ollamaURL:   cfg.OllamaURL,
+		ollamaModel: cfg.OllamaModel,
 	}
 }
 
 // CallOllama performs a non-streaming chat request (implements domain.OllamaPort)
 func (c *ollamaClient) CallOllama(prompt string) (string, error) {
 	chatReq := domain.OllamaChatRequest{
-		Model: ollamaModel,
+		Model: c.ollamaModel,
 		Messages: []domain.OllamaChatMessage{{
 			Role:    "user",
 			Content: prompt,
@@ -40,7 +42,7 @@ func (c *ollamaClient) CallOllama(prompt string) (string, error) {
 		return "", fmt.Errorf("failed to marshal chat request: %w", err)
 	}
 
-	request, err := http.NewRequest("POST", ollamaURL, bytes.NewReader(chatData))
+	request, err := http.NewRequest("POST", c.ollamaURL, bytes.NewReader(chatData))
 	if err != nil {
 		return "", fmt.Errorf("failed to create new HTTP request: %w", err)
 	}
