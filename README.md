@@ -161,25 +161,3 @@ curl -X POST http://localhost:8080/generate \
 ---
 
 _Made for the ModelVault take-home project._
-
-```
-{"response": "..."}
-```
-
-## Logs
-
-AI Generation interactions are logged to `logs/log.jsonl` in JSONL format.
-Everything else is logged to console.
-
-## Notes
-- The API is minimal and synchronous for simplicity. For streaming/token-by-token output, see Ollama's streaming API and Go's `http.Flusher`.
-- Only runs locally, no cloud LLMs are used.
-
-## Improvements
-- Add streaming responses for token-by-token output
-- Add CLI or Postman collection for easier testing
-- Add tests and error handling improvements
-
----
-
-Made for the ModelVault take-home project.
