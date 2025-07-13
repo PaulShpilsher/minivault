@@ -1,20 +1,21 @@
-package interfaces
+package api
 
 import (
 	"bytes"
 	"encoding/json"
 	"minivault/domain"
 	"net/http"
+
 	"github.com/google/uuid"
 )
 
-type HttpHandler struct {
+type handler struct {
 	generator domain.GeneratorPort
 	logger    domain.LoggerPort
 }
 
 func NewHttpHandler(generator domain.GeneratorPort, logger domain.LoggerPort) domain.HttpHandlerPort {
-	return &HttpHandler{generator: generator, logger: logger}
+	return &handler{generator: generator, logger: logger}
 }
 
 // Generate handles /generate POST requests with improved error logging and structured responses.
@@ -22,13 +23,13 @@ func writeError(w http.ResponseWriter, logger domain.LoggerPort, reqID string, m
 	if err != nil {
 		logger.LogError(msg+" [reqID: "+reqID+"]", err)
 	} else {
-		logger.LogWarn(msg+" [reqID: "+reqID+"]")
+		logger.LogWarn(msg + " [reqID: " + reqID + "]")
 	}
 	w.Header().Set("X-Request-ID", reqID)
 	http.Error(w, msg+" [reqID: "+reqID+"]", code)
 }
 
-func (h *HttpHandler) Generate(w http.ResponseWriter, r *http.Request) {
+func (h *handler) Generate(w http.ResponseWriter, r *http.Request) {
 	// Assign a request ID for tracing
 	reqID := uuid.New().String()
 

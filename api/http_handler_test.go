@@ -1,4 +1,4 @@
-package interfaces
+package api
 
 import (
 	"bytes"
@@ -7,8 +7,8 @@ import (
 	"minivault/mocks"
 	"net/http"
 	"net/http/httptest"
-	"testing"
 	"strings"
+	"testing"
 )
 
 // contains is a helper for substring checks
@@ -19,7 +19,7 @@ func contains(s, substr string) bool {
 func TestGenerate_Success(t *testing.T) {
 	mockGen := &mocks.MockGenerator{Response: "hello"}
 	mockLog := &mocks.MockLogger{}
-	h := &HttpHandler{generator: mockGen, logger: mockLog}
+	h := &handler{generator: mockGen, logger: mockLog}
 
 	reqBody := []byte(`{"prompt": "hi"}`)
 	req := httptest.NewRequest(http.MethodPost, "/generate", bytes.NewReader(reqBody))
@@ -42,7 +42,7 @@ func TestGenerate_Success(t *testing.T) {
 func TestGenerate_InvalidJSON(t *testing.T) {
 	mockGen := &mocks.MockGenerator{}
 	mockLog := &mocks.MockLogger{}
-	h := &HttpHandler{generator: mockGen, logger: mockLog}
+	h := &handler{generator: mockGen, logger: mockLog}
 
 	req := httptest.NewRequest(http.MethodPost, "/generate", bytes.NewReader([]byte("{")))
 	rec := httptest.NewRecorder()
@@ -66,7 +66,7 @@ func TestGenerate_InvalidJSON(t *testing.T) {
 func TestGenerate_EmptyPrompt(t *testing.T) {
 	mockGen := &mocks.MockGenerator{}
 	mockLog := &mocks.MockLogger{}
-	h := &HttpHandler{generator: mockGen, logger: mockLog}
+	h := &handler{generator: mockGen, logger: mockLog}
 
 	reqBody := []byte(`{"prompt": "   "}`)
 	req := httptest.NewRequest(http.MethodPost, "/generate", bytes.NewReader(reqBody))
@@ -94,7 +94,7 @@ func TestGenerate_EmptyPrompt(t *testing.T) {
 func TestGenerate_GETMethod(t *testing.T) {
 	mockGen := &mocks.MockGenerator{}
 	mockLog := &mocks.MockLogger{}
-	h := &HttpHandler{generator: mockGen, logger: mockLog}
+	h := &handler{generator: mockGen, logger: mockLog}
 
 	req := httptest.NewRequest(http.MethodGet, "/generate", nil)
 	rec := httptest.NewRecorder()
@@ -118,7 +118,7 @@ func TestGenerate_GETMethod(t *testing.T) {
 func TestGenerate_MissingPromptField(t *testing.T) {
 	mockGen := &mocks.MockGenerator{}
 	mockLog := &mocks.MockLogger{}
-	h := &HttpHandler{generator: mockGen, logger: mockLog}
+	h := &handler{generator: mockGen, logger: mockLog}
 
 	req := httptest.NewRequest(http.MethodPost, "/generate", bytes.NewReader([]byte(`{}`)))
 	rec := httptest.NewRecorder()
@@ -142,7 +142,7 @@ func TestGenerate_MissingPromptField(t *testing.T) {
 func TestGenerate_InvalidContentType(t *testing.T) {
 	mockGen := &mocks.MockGenerator{Response: "ok"}
 	mockLog := &mocks.MockLogger{}
-	h := &HttpHandler{generator: mockGen, logger: mockLog}
+	h := &handler{generator: mockGen, logger: mockLog}
 
 	req := httptest.NewRequest(http.MethodPost, "/generate", bytes.NewReader([]byte(`{"prompt":"foo"}`)))
 	req.Header.Set("Content-Type", "text/plain")
@@ -163,7 +163,7 @@ func TestGenerate_LargePrompt(t *testing.T) {
 	}
 	mockGen := &mocks.MockGenerator{Response: "ok"}
 	mockLog := &mocks.MockLogger{}
-	h := &HttpHandler{generator: mockGen, logger: mockLog}
+	h := &handler{generator: mockGen, logger: mockLog}
 
 	body := []byte(`{"prompt":"` + string(large) + `"}`)
 	req := httptest.NewRequest(http.MethodPost, "/generate", bytes.NewReader(body))
@@ -180,7 +180,7 @@ func TestGenerate_GeneratorCustomError(t *testing.T) {
 	errMsg := "custom error"
 	mockGen := &mocks.MockGenerator{Error: &mockError{errMsg}}
 	mockLog := &mocks.MockLogger{}
-	h := &HttpHandler{generator: mockGen, logger: mockLog}
+	h := &handler{generator: mockGen, logger: mockLog}
 
 	reqBody := []byte(`{"prompt": "fail"}`)
 	req := httptest.NewRequest(http.MethodPost, "/generate", bytes.NewReader(reqBody))
@@ -205,7 +205,7 @@ func TestGenerate_GeneratorCustomError(t *testing.T) {
 func TestGenerate_GeneratorError(t *testing.T) {
 	mockGen := &mocks.MockGenerator{Error: errTest}
 	mockLog := &mocks.MockLogger{}
-	h := &HttpHandler{generator: mockGen, logger: mockLog}
+	h := &handler{generator: mockGen, logger: mockLog}
 
 	reqBody := []byte(`{"prompt": "fail"}`)
 	req := httptest.NewRequest(http.MethodPost, "/generate", bytes.NewReader(reqBody))
@@ -230,4 +230,5 @@ func TestGenerate_GeneratorError(t *testing.T) {
 var errTest = &mockError{"fail"}
 
 type mockError struct{ msg string }
+
 func (e *mockError) Error() string { return e.msg }
