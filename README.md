@@ -2,6 +2,9 @@
 
 A minimal, production-grade REST API for prompt generation using a local LLM (Ollama with gemma:2b). Built with Domain-Driven Design (DDD) principles, clean architecture, and robust testing.
 
+- Minimal, synchronous API for clarity.
+- All logic is local; no cloud LLMs are used.
+
 ---
 
 ## ⚡ Quickstart
@@ -185,12 +188,6 @@ MiniVault uses environment variables (optionally loaded from a `.env` file) for 
 - **No logs?** The `logs/` directory is created automatically. Check permissions if missing.
 - **Prompt too large?** Requests over 4KB will be rejected.
 - **Model not found?** Make sure the model in `OLLAMA_MODEL` is installed in your Ollama instance.
-
----
-
-## ℹ️ Notes
-- Minimal, synchronous API for clarity. For streaming, see Ollama docs and Go's `http.Flusher`.
-- All logic is local; no cloud LLMs are used.
 
 ---
 
